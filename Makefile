@@ -35,7 +35,6 @@ build-debug build-release: build-%: build_%/CMakeCache.txt
 .PHONY: test-debug test-release
 test-debug test-release: test-%: build-%
 	cmake --build build_$* -j $(NPROCS) --target pg_service_template_unittest
-	cmake --build build_$* -j $(NPROCS) --target pg_service_template_benchmark
 	cd build_$* && ((test -t 1 && GTEST_COLOR=1 PYTEST_ADDOPTS="--color=yes" ctest -V) || ctest -V)
 	pycodestyle tests
 

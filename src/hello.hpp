@@ -7,9 +7,8 @@
 
 namespace pg_service_template {
 
-enum class UserType { kFirstTime, kKnown };
-std::string SayHelloTo(std::string_view name, UserType type);
+std::string Convert(std::string_view from_currency, std::string_view to_currency, double amount);
 
-void AppendHello(userver::components::ComponentList& component_list);
+void AppendCurrencyConverter(userver::components::ComponentList& component_list);
 
 }  // namespace pg_service_template

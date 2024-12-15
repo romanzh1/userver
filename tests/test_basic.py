@@ -3,37 +3,48 @@ import pytest
 from testsuite.databases import pgsql
 
 
-# Start the tests via `make test-debug` or `make test-release`
-
-
-async def test_first_time_users(service_client):
+# Тест успешной конвертации валют
+async def test_currency_conversion(service_client):
     response = await service_client.post(
-        '/v1/hello',
-        params={'name': 'userver'},
+        '/v1/converter',
+        params={
+            'from_currency': 'USD',
+            'to_currency': 'EUR',
+            'amount': '100',
+        },
     )
     assert response.status == 200
-    assert response.text == 'Hello, userver!\n'
+    assert response.text == 'Converted amount: 85.00 EUR\n'
 
 
-async def test_db_updates(service_client):
-    response = await service_client.post('/v1/hello', params={'name': 'World'})
+async def test_missing_parameters(service_client):
+    response = await service_client.post('/v1/converter', params={})
     assert response.status == 200
-    assert response.text == 'Hello, World!\n'
+    assert response.text == 'Missing required parameters: from_currency, to_currency, amount\n'
 
-    response = await service_client.post('/v1/hello', params={'name': 'World'})
-    assert response.status == 200
-    assert response.text == 'Hi again, World!\n'
 
-    response = await service_client.post('/v1/hello', params={'name': 'World'})
+async def test_invalid_amount(service_client):
+    response = await service_client.post(
+        '/v1/converter',
+        params={
+            'from_currency': 'USD',
+            'to_currency': 'EUR',
+            'amount': 'abc',
+        },
+    )
     assert response.status == 200
-    assert response.text == 'Hi again, World!\n'
+    assert response.text == 'Invalid amount parameter\n'
 
 
 @pytest.mark.pgsql('db_1', files=['initial_data.sql'])
-async def test_db_initial_data(service_client):
+async def test_conversion_rate_not_found(service_client):
     response = await service_client.post(
-        '/v1/hello',
-        params={'name': 'user-from-initial_data.sql'},
+        '/v1/converter',
+        params={
+            'from_currency': 'USD',
+            'to_currency': 'INR',
+            'amount': '100',
+        },
     )
     assert response.status == 200
-    assert response.text == 'Hi again, user-from-initial_data.sql!\n'
+    assert response.text == 'Conversion rate not found for USD to INR\n'

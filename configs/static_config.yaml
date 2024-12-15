@@ -50,8 +50,8 @@ components_manager:
             throttling_enabled: false
             url_trailing_slash: strict-match
 
-        handler-hello:                    # Finally! Our handler.
-            path: /v1/hello               # Registering handler by URL '/v1/hello'.
+        handler-currency-converter:                    # Finally! Our handler.
+            path: /v1/converter               # Registering handler by URL '/v1/hello'.
             method: POST                  # It will only reply to POST requests.
             task_processor: main-task-processor  # Run it on CPU bound task processor
 
